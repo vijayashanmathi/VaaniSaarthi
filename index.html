@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaniSaarthi - AI-Powered Accessible Smart Form Automation System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#1d70b8',
+                            600: '#005ea5',
+                            700: '#00437a',
+                            800: '#002f56',
+                        },
+                        govGreen: '#00703c',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 2s infinite ease-in-out;
+        }
+
+        /* Print Specific Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-document, #printable-document * {
+                visibility: visible;
+            }
+            #printable-document {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        
+        .high-contrast {
+            filter: contrast(140%);
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+        
+        .high-contrast .bg-white {
+            background-color: #121212 !important;
+            color: #fff !important;
+            border-color: #444 !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between antialiased transition-all duration-300">
+
+    <!-- Header Navbar -->
+    <header class="bg-brand-700 text-white shadow-md sticky top-0 z-50 no-print">
+        <div class="max-w-4xl mx-mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('screen-welcome')">
+                <div class="w-10 h-10 bg-white text-brand-700 rounded-full flex items-center justify-center font-bold text-xl shadow">
+                    <i class="fa-solid fa-microphone-lines"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
+                        VaniSaarthi
+                        <span class="text-xs font-normal bg-brand-800 border border-brand-500 px-2 py-0.5 rounded-full text-blue-200">AI Voice Assistant</span>
+                    </h1>
+                    <p class="text-xs text-blue-100 hidden sm:block">Government Form Automation System</p>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center space-x-3">
+                <!-- Language Selector -->
+                <div class="relative inline-block text-left">
+                    <select id="global-lang-select" onchange="changeLanguage(this.value)" class="bg-brand-800 border border-brand-500 text-white text-xs sm:text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <option value="EN">🌐 English</option>
+                        <option value="HI">🌐 हिंदी (Hindi)</option>
+                        <option value="TA">🌐 தமிழ் (Tamil)</option>
+                        <option value="TE">🌐 తెలుగు (Telugu)</option>
+                        <option value="MR">🌐 मराठी (Marathi)</option>
+                    </select>
+                </div>
+
+                <!-- High Contrast Toggle -->
+                <button onclick="toggleAccessibility()" title="High Contrast Mode" class="p-2 bg-brand-800 hover:bg-brand-600 rounded-lg text-amber-300 transition">
+                    <i class="fa-solid fa-[#000]-circle-half-stroke text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center items-center">
+
+        <!-- ================= 1. LANDING / WELCOME SCREEN ================= -->
+        <section id="screen-welcome" class="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 text-center space-y-6 transition-all duration-300">
+            <!-- Pulsing Voice Icon -->
+            <div class="relative inline-block my-2">
+                <div class="absolute inset-0 rounded-full bg-brand-500 animate-pulse-ring opacity-30"></div>
+                <button onclick="speakText('Namaste! Welcome to VaniSaarthi. Talk to us in your language to fill any government form.')" class="relative z-10 w-24 h-24 bg-gradient-to-tr from-brand-600 to-brand-500 rounded-full text-white text-4xl flex items-center justify-center shadow-lg hover:scale-105 transition duration-200 focus:outline-none focus:ring-4 focus:ring-brand-100">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+            </div>
+
+            <div>
+                <h2 id="welcome-title" class="text-3xl font-extrabold text-brand-800 tracking-tight">Namaste! नमस्ते</h2>
+                <p id="welcome-subtitle" class="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+                    Fill any government form using just your voice. No typing needed — talk to us in your language, and we'll do the rest.
+                </p>
+            </div>
+
+            <!-- Multilingual Prompt Strip -->
+            <div class="bg-brand-50 border border-brand-100 py-2.5 px-4 rounded-xl text-xs sm:text-sm text-brand-700 font-medium tracking-wide">
+                बोलकर फॉर्म भरें • குரலில் படிவம் நிரப்புங்கள் • Voice Guided
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="grid grid-cols-2 gap-4 pt-2">
+                <button onclick="navigateTo('screen-signup')" class="w-full py-3.5 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-semibold rounded-2xl shadow-md transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Sign Up</span>
+                </button>
+                <button onclick="navigateTo('screen-form-select')" class="w-full py-3.5 bg-white border-2 border-brand-600 text-brand-600 hover:bg-brand-50 font-semibold rounded-2xl transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-[#000] fa-lock"></i>
+                    <span>Login</span>
+                </button>
+            </div>
+
+            <!-- Security Footnote -->
+            <p class="text-xs text-slate-400 flex items-center justify-center gap-1.5 pt-2">
+                <i class="fa-solid fa-shield-halved text-govGreen"></i>
+                Voice biometric secured • Auto data deletion after session
+            </p>
+        </section>
+
+        <!-- ================= 2. SIGN UP / VOICE BIOMETRIC REGISTRATION ================= -->
+        <section id="screen-signup" class="hidden w-full max-w-lg bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 space-y-6 transition-all duration-300">
+            <div class="text-center space-y-1">
+                <h2 class="text-2xl font-bold text-brand-800 flex items-center justify-center gap-2">
+                    Create Account 🌟
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500">Register your voice biometric for secure, password-free access</p>
+            </div>
+
+            <!-- Input Fields -->
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name</label>
+                    <input type="text" id="reg-name" value="Kim Namjoon" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-800 font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Mobile Number</label>
+                    <input type="tel" id="reg-mobile" value="9361698662" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-800 font-medium">
+                </div>
+            </div>
+
+            <!-- Voice Enrollment Card -->
+            <div class="bg-brand-50/70 border border-brand-100 rounded-2xl p-5 text-center space-y-4">
+                <span class="text-xs font-semibold text-brand-700 tracking-wider uppercase flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-microphone"></i> Register Voice Biometric
+                </span>
+
+                <div class="relative inline-block">
+                    <button id="mic-enroll-btn" onclick="enrollVoiceSample()" class="w-20 h-20 bg-brand-600 hover:bg-brand-700 text-white rounded-full flex items-center justify-center text-2xl shadow-md transition active:scale-95">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+
+                <!-- Live Sample Progress Dots -->
+                <div id="sample-dots" class="flex justify-center space-x-2 my-2">
+                    <span class="w-3 h-3 rounded-full bg-slate-300"></span>
+                    <span class="w-3 h-3 rounded-full bg-slate-300"></span>
+                    <span class="w-3 h-3 rounded-full bg-slate-300"></span>
+                </div>
+
+                <p class="text-xs text-slate-600 font-medium" id="voice-enroll-status">Tap mic and say your passphrase 3 times</p>
+
+                <div class="bg-white rounded-xl py-2 px-4 border border-brand-100 flex justify-between items-center text-xs font-medium text-slate-700">
+                    <span>Voice Enrollment Progress</span>
+                    <span id="sample-count-text" class="text-brand-600 font-bold">0/3 samples</span>
+                </div>
+            </div>
+
+            <!-- Submission & Nav -->
+            <button onclick="navigateTo('screen-form-select')" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-sparkles"></i> Create Account
+            </button>
+
+            <p class="text-center text-xs text-slate-500">
+                Already have an account? <button onclick="navigateTo('screen-form-select')" class="text-brand-600 font-semibold underline">Login</button>
+            </p>
+        </section>
+
+        <!-- ================= 3. FORM SELECTION SCREEN ================= -->
+        <section id="screen-form-select" class="hidden w-full max-w-xl bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 space-y-6 transition-all duration-300">
+            <div class="text-center space-y-1">
+                <h2 class="text-2xl font-bold text-brand-800">Which form do you need? 📋</h2>
+                <p class="text-xs sm:text-sm text-slate-500">Speak the form name or tap to select</p>
+            </div>
+
+            <!-- Voice Search Simulator Prompt Bar -->
+            <div class="bg-brand-50 border-2 border-brand-200 rounded-2xl p-3.5 flex items-center gap-3">
+                <button onclick="startVoiceRecognition('search')" class="w-10 h-10 bg-brand-600 text-white rounded-xl flex items-center justify-center shrink-0 hover:bg-brand-700 transition">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <div class="flex-grow text-left">
+                    <p class="text-xs text-slate-400">Say: "Aadhaar", "Ration Card", "Income Certificate"...</p>
+                    <p id="selected-form-label" class="text-sm font-semibold text-brand-800">Selected: Birth Certificate</p>
+                </div>
+            </div>
+
+            <!-- Grid Options -->
+            <div class="grid grid-cols-2 gap-3.5 text-left">
+                <!-- Aadhaar Update -->
+                <div onclick="selectForm('Aadhaar Update', this)" class="form-option-card border-2 border-slate-100 hover:border-brand-300 bg-slate-50/50 p-4 rounded-2xl cursor-pointer transition">
+                    <div class="text-2xl mb-1">🪪</div>
+                    <h3 class="font-bold text-sm text-slate-800">Aadhaar Update</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Address, mobile, biometric update</p>
+                </div>
+
+                <!-- Ration Card -->
+                <div onclick="selectForm('Ration Card', this)" class="form-option-card border-2 border-slate-100 hover:border-brand-300 bg-slate-50/50 p-4 rounded-2xl cursor-pointer transition">
+                    <div class="text-2xl mb-1">🌾</div>
+                    <h3 class="font-bold text-sm text-slate-800">Ration Card</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">New/update ration card application</p>
+                </div>
+
+                <!-- Income Certificate -->
+                <div onclick="selectForm('Income Certificate', this)" class="form-option-card border-2 border-slate-100 hover:border-brand-300 bg-slate-50/50 p-4 rounded-2xl cursor-pointer transition">
+                    <div class="text-2xl mb-1">📄</div>
+                    <h3 class="font-bold text-sm text-slate-800">Income Certificate</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Annual income verification</p>
+                </div>
+
+                <!-- Pension Form -->
+                <div onclick="selectForm('Pension Form', this)" class="form-option-card border-2 border-slate-100 hover:border-brand-300 bg-slate-50/50 p-4 rounded-2xl cursor-pointer transition">
+                    <div class="text-2xl mb-1">🏛️</div>
+                    <h3 class="font-bold text-sm text-slate-800">Pension Form</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Old age / widow pension</p>
+                </div>
+
+                <!-- Birth Certificate (DEFAULT SELECTED) -->
+                <div onclick="selectForm('Birth Certificate', this)" class="form-option-card border-2 border-brand-500 bg-brand-50/40 p-4 rounded-2xl cursor-pointer transition ring-2 ring-brand-200">
+                    <div class="text-2xl mb-1">👶</div>
+                    <h3 class="font-bold text-sm text-brand-800">Birth Certificate</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">New birth registration</p>
+                </div>
+
+                <!-- Health Card -->
+                <div onclick="selectForm('Health Card', this)" class="form-option-card border-2 border-slate-100 hover:border-brand-300 bg-slate-50/50 p-4 rounded-2xl cursor-pointer transition">
+                    <div class="text-2xl mb-1">🏥</div>
+                    <h3 class="font-bold text-sm text-slate-800">Health Card</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Ayushman / state health card</p>
+                </div>
+            </div>
+
+            <!-- Start Filling Action -->
+            <button onclick="navigateTo('screen-form-fill')" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                <span>📝 Start Filling</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <!-- Auto-delete banner -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-800 text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-amber-600"></i>
+                Your data is automatically deleted after session ends for your privacy
+            </div>
+        </section>
+
+        <!-- ================= 4. FORM FILLING & DOCUMENT SCAN SCREEN ================= -->
+        <section id="screen-form-fill" class="hidden w-full max-w-xl bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 space-y-6 transition-all duration-300">
+            
+            <!-- Security Timer Banner -->
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs py-2 px-4 rounded-xl flex items-center justify-between font-medium">
+                <span class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock text-govGreen"></i> Secured with voice biometric
+                </span>
+                <span id="session-timer" class="font-mono font-bold">Data auto-deletes in 29:40</span>
+            </div>
+
+            <!-- AR Document Scan Trigger Area -->
+            <div id="ocr-drop-area" onclick="triggerOCRScan()" class="border-2 border-dashed border-brand-300 bg-brand-50/30 hover:bg-brand-50/80 rounded-2xl p-6 text-center cursor-pointer transition space-y-2">
+                <div class="w-12 h-12 bg-brand-100 text-brand-700 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-800 text-sm">Scan your ID document</h4>
+                    <p class="text-xs text-slate-500">Auto-fill from Aadhaar, PAN, Voter ID or any document</p>
+                </div>
+                <button class="px-4 py-1.5 bg-white border border-brand-300 text-brand-700 rounded-lg text-xs font-semibold shadow-sm hover:bg-brand-50">
+                    Tap to scan / Say "scan my document"
+                </button>
+            </div>
+
+            <!-- Simulated Voice Assistant Voice Status Bar -->
+            <div class="bg-brand-50 border border-brand-200 rounded-2xl p-4 text-center space-y-2">
+                <div class="flex items-center justify-center gap-2 text-xs font-semibold text-brand-700">
+                    <i class="fa-solid fa-microphone animate-pulse"></i>
+                    <span id="voice-prompt-text">Please say your 6-digit PIN code</span>
+                </div>
+                
+                <div id="ocr-status-badge" class="hidden bg-emerald-100 text-emerald-800 text-xs font-semibold py-1.5 px-3 rounded-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-check text-govGreen"></i> Demo: All fields filled automatically!
+                </div>
+
+                <div class="flex justify-center items-center space-x-1.5 py-1">
+                    <span class="w-2 h-4 bg-brand-500 rounded-full animate-bounce"></span>
+                    <span class="w-2 h-6 bg-brand-600 rounded-full animate-bounce delay-100"></span>
+                    <span class="w-2 h-3 bg-brand-400 rounded-full animate-bounce delay-200"></span>
+                </div>
+            </div>
+
+            <!-- Auto-populated Dynamic Form Fields -->
+            <div class="space-y-3 text-left">
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Full Name</p>
+                        <input type="text" id="field-name" value="Ramesh Kumar Sharma" class="bg-transparent font-semibold text-slate-800 text-sm w-full focus:outline-none">
+                    </div>
+                    <button onclick="editField('field-name')" class="text-brand-600 p-1.5 hover:bg-brand-50 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Date of Birth</p>
+                        <input type="text" id="field-dob" value="15 March 1972" class="bg-transparent font-semibold text-slate-800 text-sm w-full focus:outline-none">
+                    </div>
+                    <button onclick="editField('field-dob')" class="text-brand-600 p-1.5 hover:bg-brand-50 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Mobile Number</p>
+                        <input type="text" id="field-mobile" value="98765 43210" class="bg-transparent font-semibold text-slate-800 text-sm w-full focus:outline-none">
+                    </div>
+                    <button onclick="editField('field-mobile')" class="text-brand-600 p-1.5 hover:bg-brand-50 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Address</p>
+                        <input type="text" id="field-address" value="42, Gandhi Nagar, Near Post Office" class="bg-transparent font-semibold text-slate-800 text-sm w-full focus:outline-none">
+                    </div>
+                    <button onclick="editField('field-address')" class="text-brand-600 p-1.5 hover:bg-brand-50 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">District / City</p>
+                        <input type="text" id="field-district" value="Chennai" class="bg-transparent font-semibold text-slate-800 text-sm w-full focus:outline-none">
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">PIN Code</p>
+                        <input type="text" id="field-pincode" value="600001" class="bg-transparent font-semibold text-slate-800 text-sm w-full focus:outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nav Actions -->
+            <div class="flex gap-3 pt-2">
+                <button onclick="navigateTo('screen-form-select')" class="w-1/2 py-3 bg-white border border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition text-sm">
+                    ← Change Form
+                </button>
+                <button onclick="navigateTo('screen-review')" class="w-1/2 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">
+                    Review & Confirm →
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= 5. REVIEW FORM SCREEN ================= -->
+        <section id="screen-review" class="hidden w-full max-w-xl bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 space-y-6 transition-all duration-300">
+            <div class="text-center space-y-1">
+                <div class="w-12 h-12 bg-emerald-100 text-govGreen rounded-full flex items-center justify-center mx-auto text-xl mb-2">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-brand-800">Review Your Details</h2>
+                <p class="text-xs sm:text-sm text-slate-500">Please confirm all information is correct</p>
+            </div>
+
+            <!-- Interactive Voice Status Box -->
+            <div class="bg-brand-50 border border-brand-200 rounded-2xl p-4 text-center space-y-1">
+                <p class="text-xs font-semibold text-brand-800 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-microphone"></i> Say "confirm" to proceed or "edit" to make changes
+                </p>
+                <p id="voice-review-status" class="text-xs text-slate-500 italic">Listening for your confirmation...</p>
+            </div>
+
+            <!-- Summary Table / Card -->
+            <div class="bg-amber-50/50 border border-amber-100 rounded-2xl p-4 text-xs space-y-2.5 text-slate-700">
+                <div class="flex justify-between border-b border-amber-200/50 pb-2">
+                    <span class="text-slate-500">Form Type</span>
+                    <span id="rev-type" class="font-bold text-slate-900">Birth Certificate</span>
+                </div>
+                <div class="flex justify-between border-b border-amber-200/50 pb-2">
+                    <span class="text-slate-500">Full Name</span>
+                    <span id="rev-name" class="font-bold text-slate-900">Ramesh Kumar Sharma</span>
+                </div>
+                <div class="flex justify-between border-b border-amber-200/50 pb-2">
+                    <span class="text-slate-500">Date of Birth</span>
+                    <span id="rev-dob" class="font-bold text-slate-900">15 March 1972</span>
+                </div>
+                <div class="flex justify-between border-b border-amber-200/50 pb-2">
+                    <span class="text-slate-500">Mobile</span>
+                    <span id="rev-mobile" class="font-bold text-slate-900">98765 43210</span>
+                </div>
+                <div class="flex justify-between border-b border-amber-200/50 pb-2">
+                    <span class="text-slate-500">Address</span>
+                    <span id="rev-address" class="font-bold text-slate-900 text-right">42, Gandhi Nagar, Near Post Office</span>
+                </div>
+                <div class="flex justify-between border-b border-amber-200/50 pb-2">
+                    <span class="text-slate-500">District</span>
+                    <span id="rev-district" class="font-bold text-slate-900">Chennai</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">PIN Code</span>
+                    <span id="rev-pincode" class="font-bold text-slate-900">600001</span>
+                </div>
+            </div>
+
+            <!-- Warning Banner -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-trash-can"></i> Your data will be permanently deleted after you print or exit this session
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 pt-2">
+                <button onclick="navigateTo('screen-form-fill')" class="w-1/3 py-3 bg-white border border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition text-sm flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-pen"></i> Edit
+                </button>
+                <button onclick="navigateTo('screen-download')" class="w-2/3 py-3 bg-govGreen hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check"></i> Confirm & Print →
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= 6. DOWNLOAD & PRINT SCREEN ================= -->
+        <section id="screen-download" class="hidden w-full max-w-xl bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 space-y-6 transition-all duration-300">
+            <div class="text-center space-y-1">
+                <div class="w-12 h-12 bg-emerald-100 text-govGreen rounded-full flex items-center justify-center mx-auto text-xl mb-1">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-govGreen">Form Filled Successfully!</h2>
+                <p class="text-xs sm:text-sm text-slate-500">Your form has been filled and is ready to download</p>
+            </div>
+
+            <!-- Official Certificate Document Preview Card -->
+            <div id="printable-document" class="border-2 border-brand-800 rounded-2xl p-6 bg-white shadow-sm space-y-4 text-left relative overflow-hidden">
+                <div class="text-center border-b-2 border-brand-800 pb-3">
+                    <p class="text-xs uppercase font-bold tracking-widest text-slate-500">Government of India</p>
+                    <h3 id="doc-title" class="text-lg font-extrabold text-brand-800 tracking-wide uppercase mt-0.5">Birth Certificate</h3>
+                    <p class="text-[10px] text-slate-400 font-mono mt-0.5">Application Reference: <span id="doc-ref">VS-2024-768559</span></p>
+                </div>
+
+                <div class="space-y-2 text-xs">
+                    <div class="grid grid-cols-3 py-1 border-b border-slate-100">
+                        <span class="text-slate-500 font-medium">Full Name</span>
+                        <span id="doc-name" class="col-span-2 font-bold text-slate-800">Ramesh Kumar Sharma</span>
+                    </div>
+                    <div class="grid grid-cols-3 py-1 border-b border-slate-100">
+                        <span class="text-slate-500 font-medium">Date of Birth</span>
+                        <span id="doc-dob" class="col-span-2 font-bold text-slate-800">15 March 1972</span>
+                    </div>
+                    <div class="grid grid-cols-3 py-1 border-b border-slate-100">
+                        <span class="text-slate-500 font-medium">Mobile Number</span>
+                        <span id="doc-mobile" class="col-span-2 font-bold text-slate-800">98765 43210</span>
+                    </div>
+                    <div class="grid grid-cols-3 py-1 border-b border-slate-100">
+                        <span class="text-slate-500 font-medium">Full Address</span>
+                        <span id="doc-address" class="col-span-2 font-bold text-slate-800">42, Gandhi Nagar, Near Post Office</span>
+                    </div>
+                    <div class="grid grid-cols-3 py-1 border-b border-slate-100">
+                        <span class="text-slate-500 font-medium">District</span>
+                        <span id="doc-district" class="col-span-2 font-bold text-slate-800">Chennai</span>
+                    </div>
+                    <div class="grid grid-cols-3 py-1">
+                        <span class="text-slate-500 font-medium">PIN Code</span>
+                        <span id="doc-pincode" class="col-span-2 font-bold text-slate-800">600001</span>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-200 text-[10px] text-slate-400 text-center flex justify-between items-center">
+                    <span>Generated by VaniSaarthi AI Form System</span>
+                    <span id="doc-date">17 March 2026</span>
+                </div>
+
+                <div class="absolute bottom-1 right-2 opacity-10 text-brand-800 text-6xl pointer-events-none">
+                    <i class="fa-solid fa-stamp"></i>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 gap-3 no-print">
+                <button onclick="triggerPrint()" class="py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-print"></i> Print PDF
+                </button>
+                <button onclick="triggerDownload()" class="py-3 bg-white border-2 border-brand-600 text-brand-600 hover:bg-brand-50 font-semibold rounded-xl transition text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i> Download
+                </button>
+            </div>
+
+            <button onclick="navigateTo('screen-welcome')" class="no-print w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition text-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-arrow-rotate-left"></i> Fill Another Form
+            </button>
+
+            <!-- Auto Delete Notice Banner -->
+            <div class="no-print bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-shield-halved text-amber-600"></i> All personal data will be deleted from VaniSaarthi servers within 60 minutes of session end
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Voice Assistant Trigger (Persistent) -->
+    <div class="fixed bottom-6 right-6 z-40 no-print">
+        <button onclick="speakText('VaniSaarthi active. Tap to speak or ask for assistance.')" class="w-14 h-14 bg-brand-600 text-white rounded-full flex items-center justify-center text-xl shadow-2xl hover:scale-110 active:scale-95 transition-all focus:outline-none border-2 border-white">
+            <i class="fa-solid fa-microphone"></i>
+        </button>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2">
+        <i class="fa-solid fa-circle-info text-brand-400"></i>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-100 border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print mt-auto">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p>© 2026 VaniSaarthi • Professional Readiness for Innovation & Employability</p>
+            <p class="text-slate-400">Team V | Tamilselvi S & Vijaya Shanmathi V</p>
+        </div>
+    </footer>
+
+    <script>
+        // App State Store
+        const appState = {
+            currentLanguage: 'EN',
+            selectedForm: 'Birth Certificate',
+            voiceSamplesCount: 0,
+            formData: {
+                name: 'Ramesh Kumar Sharma',
+                dob: '15 March 1972',
+                mobile: '98765 43210',
+                address: '42, Gandhi Nagar, Near Post Office',
+                district: 'Chennai',
+                pincode: '600001'
+            }
+        };
+
+        // Screen Navigation Engine
+        function navigateTo(screenId) {
+            const screens = [
+                'screen-welcome', 
+                'screen-signup', 
+                'screen-form-select', 
+                'screen-form-fill', 
+                'screen-review', 
+                'screen-download'
+            ];
+
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (id === screenId) {
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                }
+            });
+
+            // Update Sync Data on Navigation
+            syncFormData();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Language Switcher Engine
+        function changeLanguage(langCode) {
+            appState.currentLanguage = langCode;
+            const welcomeTitle = document.getElementById('welcome-title');
+            const welcomeSub = document.getElementById('welcome-subtitle');
+
+            const translations = {
+                'EN': { title: 'Namaste! Welcome', sub: "Fill any government form using just your voice. No typing needed — talk to us in your language, and we'll do the rest." },
+                'HI': { title: 'नमस्ते! स्वागत है', sub: 'केवल अपनी आवाज का उपयोग करके कोई भी सरकारी फॉर्म भरें। किसी टाइपिंग की आवश्यकता नहीं है।' },
+                'TA': { title: 'வணக்கம்! நல்வரவு', sub: 'உங்கள் குரலைப் பயன்படுத்தி எந்தவொரு அரசுப் படிவத்தையும் நிரப்புங்கள். தட்டச்சு செய்யத் தேவையில்லை.' },
+                'TE': { title: 'నమస్కారం! స్వాగతం', sub: 'మీ వాయిస్‌ని ఉపయోగించి ఏ ప్రభుత్వ ఫారమ్‌నైనా నింపండి. టైపింగ్ అవసరం లేదు.' },
+                'MR': { title: 'नमस्कार! स्वागत आहे', sub: 'फक्त तुमचा आवाज वापरून कोणताही शासकीय अर्ज भरा. टायपिंगची गरज नाही.' }
+            };
+
+            if (translations[langCode]) {
+                welcomeTitle.innerText = translations[langCode].title;
+                welcomeSub.innerText = translations[langCode].sub;
+            }
+
+            showToast(`Language set to ${langCode}`);
+            speakText(`Language changed to ${langCode}`);
+        }
+
+        // Voice Biometric Sample Enrollment Simulator
+        function enrollVoiceSample() {
+            if (appState.voiceSamplesCount < 3) {
+                appState.voiceSamplesCount++;
+                const dots = document.getElementById('sample-dots').children;
+                if (dots[appState.voiceSamplesCount - 1]) {
+                    dots[appState.voiceSamplesCount - 1].classList.remove('bg-slate-300');
+                    dots[appState.voiceSamplesCount - 1].classList.add('bg-brand-600');
+                }
+
+                document.getElementById('sample-count-text').innerText = `${appState.voiceSamplesCount}/3 samples`;
+                
+                if (appState.voiceSamplesCount === 3) {
+                    document.getElementById('voice-enroll-status').innerText = '✅ Biometric profile registered successfully!';
+                    document.getElementById('voice-enroll-status').classList.add('text-govGreen', 'font-bold');
+                    showToast('Voice Biometric Registered!');
+                    speakText('Voice biometric registration complete.');
+                } else {
+                    speakText(`Sample ${appState.voiceSamplesCount} recorded. Speak again.`);
+                }
+            }
+        }
+
+        // Select Form Option
+        function selectForm(formName, element) {
+            appState.selectedForm = formName;
+            
+            // Highlight selected card visually
+            const cards = document.querySelectorAll('.form-option-card');
+            cards.forEach(card => {
+                card.classList.remove('border-brand-500', 'bg-brand-50/40', 'ring-2', 'ring-brand-200');
+                card.classList.add('border-slate-100', 'bg-slate-50/50');
+            });
+
+            if (element) {
+                element.classList.remove('border-slate-100', 'bg-slate-50/50');
+                element.classList.add('border-brand-500', 'bg-brand-50/40', 'ring-2', 'ring-brand-200');
+            }
+
+            document.getElementById('selected-form-label').innerText = `Selected: ${formName}`;
+            showToast(`Selected: ${formName}`);
+            speakText(`Selected ${formName}`);
+        }
+
+        // OCR Scan Simulation
+        function triggerOCRScan() {
+            const statusBadge = document.getElementById('ocr-status-badge');
+            const dropArea = document.getElementById('ocr-drop-area');
+
+            dropArea.classList.add('animate-pulse', 'border-govGreen');
+            
+            setTimeout(() => {
+                dropArea.classList.remove('animate-pulse', 'border-govGreen');
+                statusBadge.classList.remove('hidden');
+                showToast('OCR Document Scan Successful!');
+                speakText('Document scanned successfully. All details populated.');
+            }, 1200);
+        }
+
+        // Sync Dynamic Form Data across Review & Document Screens
+        function syncFormData() {
+            // Read inputs
+            appState.formData.name = document.getElementById('field-name').value;
+            appState.formData.dob = document.getElementById('field-dob').value;
+            appState.formData.mobile = document.getElementById('field-mobile').value;
+            appState.formData.address = document.getElementById('field-address').value;
+            appState.formData.district = document.getElementById('field-district').value;
+            appState.formData.pincode = document.getElementById('field-pincode').value;
+
+            // Sync to Review Screen
+            document.getElementById('rev-type').innerText = appState.selectedForm;
+            document.getElementById('rev-name').innerText = appState.formData.name;
+            document.getElementById('rev-dob').innerText = appState.formData.dob;
+            document.getElementById('rev-mobile').innerText = appState.formData.mobile;
+            document.getElementById('rev-address').innerText = appState.formData.address;
+            document.getElementById('rev-district').innerText = appState.formData.district;
+            document.getElementById('rev-pincode').innerText = appState.formData.pincode;
+
+            // Sync to Printable Document Screen
+            document.getElementById('doc-title').innerText = appState.selectedForm;
+            document.getElementById('doc-name').innerText = appState.formData.name;
+            document.getElementById('doc-dob').innerText = appState.formData.dob;
+            document.getElementById('doc-mobile').innerText = appState.formData.mobile;
+            document.getElementById('doc-address').innerText = appState.formData.address;
+            document.getElementById('doc-district').innerText = appState.formData.district;
+            document.getElementById('doc-pincode').innerText = appState.formData.pincode;
+        }
+
+        // Quick Input Focus
+        function editField(id) {
+            const input = document.getElementById(id);
+            if (input) {
+                input.focus();
+                showToast(`Editing field...`);
+            }
+        }
+
+        // Web Speech API - Text to Speech Engine
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop ongoing speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Web Speech API - Speech Recognition Engine / Fallback
+        function startVoiceRecognition(mode) {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.start();
+
+                showToast('Listening to your voice...');
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    showToast(`Recognized: "${transcript}"`);
+                    if (mode === 'search') {
+                        document.getElementById('selected-form-label').innerText = `Selected: ${transcript}`;
+                    }
+                };
+
+                recognition.onerror = () => {
+                    showToast('Voice listening completed.');
+                };
+            } else {
+                // Speech recognition fallback
+                showToast('Voice Recognition Simulated!');
+                speakText('Listening mode activated. You can select form options directly.');
+            }
+        }
+
+        // High Contrast Mode Toggle
+        function toggleAccessibility() {
+            document.body.classList.toggle('high-contrast');
+            showToast('Toggled Accessibility High-Contrast Mode');
+        }
+
+        // Toast Notification System
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = message;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        // Print & Download Handlers
+        function triggerPrint() {
+            window.print();
+        }
+
+        function triggerDownload() {
+            showToast('PDF Downloaded! Session data purged.');
+            speakText('PDF successfully downloaded. Your personal data has been erased from the active session.');
+        }
+
+        // Initialize Application
+        window.onload = function() {
+            // Set current date in certificate
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('doc-date').innerText = dateStr;
+            
+            // Randomize Application Reference Number
+            const randomRef = 'VS-' + now.getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('doc-ref').innerText = randomRef;
+
+            console.log("VaniSaarthi Web Application Initialized Successfully.");
+        };
+    </script>
+</body>
+</html>
